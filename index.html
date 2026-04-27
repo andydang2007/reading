@@ -36,301 +36,212 @@
             display: flex; flex-direction: column;
         }
 
-        /* 界面切换控制 */
+        /* 视图动画 */
         .view { display: none; padding: 30px; animation: fadeIn 0.4s ease-out; }
         .view.active { display: flex; flex-direction: column; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 封面样式大改版 --- */
-        #view-cover { align-items: center; text-align: center; padding-top: 8vh; }
-        .book-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 52px; color: #0f172a; margin-bottom: 15px; line-height: 1.2; }
-        .book-desc { font-size: 20px; color: #475569; margin-bottom: 40px; max-width: 90%; font-weight: 700; line-height: 1.5; }
+        /* --- 封面 --- */
+        #view-cover { align-items: center; text-align: center; padding-top: 5vh; }
+        .book-cover-img { 
+            width: 220px; height: 300px; 
+            object-fit: cover; border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            margin-bottom: 25px; border: 4px solid white;
+        }
+        .book-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 48px; color: #0f172a; margin: 0 0 10px 0; line-height: 1.2; }
+        .book-desc { font-size: 18px; color: #475569; margin-bottom: 30px; max-width: 90%; font-weight: 700; }
         
-        .char-section-title { font-weight: 900; color: #94a3b8; margin-bottom: 20px; font-size: 16px; letter-spacing: 4px; text-transform: uppercase; }
-        .char-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px; margin-bottom: 50px; }
+        .char-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 500px; margin-bottom: 40px; }
         .char-card { 
-            background: white; padding: 20px 25px; border-radius: 20px; border: 3px solid #e2e8f0;
-            text-align: left; box-shadow: 0 8px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column;
+            background: white; padding: 18px 22px; border-radius: 18px; border: 2px solid #e2e8f0;
+            text-align: left; display: flex; flex-direction: column;
         }
-        .char-name { font-weight: 900; font-size: 22px; color: var(--accent); margin-bottom: 8px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 8px; }
-        .char-intro { font-size: 18px; color: #334155; line-height: 1.6; font-weight: 700; }
+        .char-name { font-weight: 900; font-size: 20px; color: var(--accent); margin-bottom: 5px; }
+        .char-intro { font-size: 16px; color: #475569; line-height: 1.5; font-weight: 700; }
 
-        /* --- 目录样式 --- */
-        .toc-list { display: flex; flex-direction: column; gap: 15px; }
+        /* --- 目录 --- */
         .toc-item { 
-            background: white; padding: 22px; border-radius: 20px; border: 3px solid #e2e8f0;
+            background: white; padding: 20px; border-radius: 18px; border: 2px solid #e2e8f0;
             cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-            font-weight: 900; font-size: 18px; color: #1e293b; transition: 0.2s; box-shadow: 0 4px 0 #cbd5e1;
+            font-weight: 900; font-size: 18px; margin-bottom: 12px; transition: 0.2s; box-shadow: 0 4px 0 #cbd5e1;
         }
-        .toc-item:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
+        .toc-item:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; background: #eff6ff; }
 
-        /* --- 阅读页排版（出版级中文排版） --- */
+        /* --- 阅读页 --- */
         .reader-header { 
-            position: sticky; top: 0; background: rgba(255,252,240,0.95); 
-            padding: 15px 0; border-bottom: 2px solid #e2e8f0; backdrop-filter: blur(5px);
+            position: sticky; top: 0; background: rgba(255,252,240,0.96); 
+            padding: 15px 20px; border-bottom: 2px solid #e2e8f0; backdrop-filter: blur(8px);
             display: flex; justify-content: space-between; align-items: center; z-index: 100;
         }
-        .btn-back { border: none; background: none; font-size: 18px; font-weight: 900; color: var(--accent); cursor: pointer; }
-        .chapter-title-display { font-weight: 900; font-size: 20px; color: #0f172a; }
-
-        #story-content { 
-            margin-top: 20px; 
-            padding-bottom: 120px;
+        .chapter-img { 
+            width: 100%; max-height: 400px; object-fit: cover; 
+            border-radius: 20px; margin-bottom: 25px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            display: none; 
         }
 
-        /* 💡 完美的中文段落格式 */
         #story-content p {
-            font-size: 22px; 
-            line-height: 2.2; /* 给拼音留足高度 */
-            color: #1e293b;
-            font-weight: 700;
-            text-align: justify;
-            text-indent: 2em; /* 首行缩进两个中文字符 */
-            margin-bottom: 1.2em; /* 段落之间的间距 */
-            letter-spacing: 1px; /* 舒适的字间距 */
+            font-size: 22px; line-height: 2.3; color: #1e293b; font-weight: 700;
+            text-align: justify; text-indent: 2em; margin-bottom: 1.2em; letter-spacing: 2px;
         }
 
-        /* 💡 拼音核心 CSS（修复字间距完美版） */
-        ruby { 
-            cursor: pointer; 
-            position: relative; /* 让拼音以汉字为基准定位 */
-            display: inline-block; /* 破坏原生 ruby 的撑开特性 */
-            text-decoration: none;
-        }
+        /* 拼音悬浮 CSS */
+        ruby { cursor: pointer; position: relative; display: inline-block; }
         rt { 
-            opacity: 0; 
-            position: absolute; /* 🌟 绝对定位！悬浮在空中，不再占用任何宽度 */
-            left: 50%;
-            bottom: 85%; /* 悬浮在汉字上方 */
-            transform: translateX(-50%);
-            white-space: nowrap; /* 保证拼音不会换行 */
-            font-size: 0.6em; 
-            color: var(--pinyin-color); 
-            font-family: 'Comic Sans MS', sans-serif; 
-            font-weight: 900;
-            transition: opacity 0.2s ease-in-out, transform 0.2s;
-            user-select: none;
-            pointer-events: none; /* 鼠标点不中拼音，只点中汉字 */
+            opacity: 0; position: absolute; left: 50%; bottom: 85%; 
+            transform: translateX(-50%); white-space: nowrap; 
+            font-size: 0.55em; color: var(--pinyin-color); 
+            font-family: 'Comic Sans MS', sans-serif; font-weight: 900;
+            transition: 0.2s; pointer-events: none;
         }
-        rp { display: none; } /* 隐藏原生拼音库生成的括号 */
-        
-        ruby.show-py rt { 
-            opacity: 1; 
-            transform: translateX(-50%) translateY(-4px); /* 浮现时带一点向上的微动效 */
-        }
-        
-        /* 稍微把正文的字间距拉宽一点点，阅读更舒服，也避免拼音打架 */
-        #story-content p {
-            font-size: 22px; 
-            line-height: 2.2; 
-            color: #1e293b;
-            font-weight: 700;
-            text-align: justify;
-            text-indent: 2em; 
-            margin-bottom: 1.2em; 
-            letter-spacing: 2px; /* 🌟 字间距从 1px 改为 2px */
-        }
+        ruby.show-py rt { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+        b { color: #e11d48; border-bottom: 3px dashed #fecaca; }
 
-        /* 重点生词样式 */
-        b { 
-            color: #e11d48; 
-            border-bottom: 3px dashed #fecaca; 
-            padding-bottom: 2px;
-        }
-
-        /* 底部导航 */
         .nav-footer {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 800px; background: white;
-            padding: 20px 30px; display: flex; gap: 20px; border-top: 3px solid #e2e8f0;
-            box-shadow: 0 -10px 20px rgba(0,0,0,0.05);
+            padding: 15px 25px; display: flex; gap: 15px; border-top: 2px solid #e2e8f0;
         }
-        .btn-footer { flex: 1; padding: 15px; border-radius: 20px; border: none; font-weight: 900; cursor: pointer; font-size: 18px; box-shadow: 0 5px 0 rgba(0,0,0,0.1); transition: 0.15s;}
-        .btn-footer:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
-        .btn-prev { background: #f1f5f9; color: #64748b; border: 3px solid #e2e8f0; box-shadow: 0 5px 0 #cbd5e1; }
-        .btn-next { background: var(--accent); color: white; box-shadow: 0 5px 0 #2563eb; }
-        .btn-footer:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--paper-bg); z-index: 1000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        .btn-footer { flex: 1; padding: 14px; border-radius: 18px; border: none; font-weight: 900; cursor: pointer; font-size: 17px; }
+        .btn-prev { background: #f1f5f9; color: #64748b; border: 2px solid #cbd5e1; }
+        .btn-next { background: var(--accent); color: white; box-shadow: 0 4px 0 #2563eb; }
     </style>
 </head>
 <body>
 
-    <div id="loading-overlay">
-        <div style="font-size: 50px; margin-bottom: 20px; animation: float 2s infinite alternate;">📖</div>
-        <div style="font-weight: 900; color: #3b82f6; font-size: 20px;">正在从云端图书馆取书...</div>
+    <div id="loading-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--paper-bg); z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="font-size: 50px; animation: float 2s infinite alternate;">📖</div>
+        <div style="font-weight:900; color:#3b82f6; margin-top:20px;">正在载入绘本馆...</div>
     </div>
 
     <div class="phone-container">
-        
         <div id="view-cover" class="view">
-            <div id="cover-pic" style="font-size: 80px; margin-bottom: 20px;">📘</div>
+            <img id="display-cover-img" src="" class="book-cover-img" onerror="this.style.display='none'">
             <h1 class="book-title" id="display-title">载入中...</h1>
             <p class="book-desc" id="display-desc"></p>
-            
-            <div class="char-section-title">✨ 主要人物 ✨</div>
             <div class="char-grid" id="display-chars"></div>
-            
-            <button class="btn-footer btn-next" onclick="switchView('view-toc')" style="max-width: 250px; flex: none; width: 100%;">开始阅读</button>
+            <button class="btn-footer btn-next" onclick="switchView('view-toc')" style="max-width:200px; margin-bottom:50px;">开始阅读</button>
         </div>
 
         <div id="view-toc" class="view">
-            <div style="display: flex; align-items: center; margin-bottom: 30px;">
-                <button class="btn-back" onclick="switchView('view-cover')">← 返回封面</button>
-                <h2 style="margin: 0 auto; font-weight: 900; font-size: 24px; padding-right: 80px;">📚 目录</h2>
-            </div>
-            <div class="toc-list" id="display-toc"></div>
+            <header style="display:flex; align-items:center; margin-bottom:25px;">
+                <button onclick="switchView('view-cover')" style="border:none; background:none; font-weight:900; color:var(--accent); font-size:18px;">← 封面</button>
+                <h2 style="margin:0 auto; padding-right:50px;">目录</h2>
+            </header>
+            <div id="display-toc"></div>
         </div>
 
         <div id="view-reading" class="view">
             <header class="reader-header">
-                <button class="btn-back" onclick="switchView('view-toc')">⬅ 目录</button>
-                <span class="chapter-title-display" id="chapter-name-ui">章节内容</span>
-                <div style="width: 60px;"></div>
+                <button onclick="switchView('view-toc')" class="btn-footer" style="flex:none; width:80px; padding:8px; font-size:14px; background:#f1f5f9;">⬅ 目录</button>
+                <span id="chapter-name-ui" style="font-weight:900;">章节</span>
+                <div style="width:80px;"></div>
             </header>
             
-            <div id="story-content"></div>
+            <div style="margin-top:20px;">
+                <img id="chapter-illustration" src="" class="chapter-img" onerror="this.style.display='none'" onload="this.style.display='block'">
+                <div id="story-content"></div>
+            </div>
 
             <footer class="nav-footer">
-                <button class="btn-footer btn-prev" id="btn-prev-chap" onclick="moveChapter(-1)">上一章</button>
+                <button class="btn-footer btn-prev" id="btn-prev-chap" onclick="moveChapter(-1)">前一章</button>
                 <button class="btn-footer btn-next" id="btn-next-chap" onclick="moveChapter(1)">下一章</button>
             </footer>
         </div>
-
     </div>
 
 <script>
-    // 你的数据源链接
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-jsRDCZ56umRMvsaZiXPJbGYAxWEzq3kQ7Fv4JjPg3f1zhAU8uDL_HE6ZCFDOnTfJ7n81Ei0VLIWe/pub?gid=0&single=true&output=csv";
     
     let bookData = { meta: {}, characters: [], chapters: [] };
     let currentChapterIdx = 0;
 
-    // 1. 初始化并拉取数据 (已修复 URL 参数拼接问题)
     async function loadBook() {
         Papa.parse(CSV_URL + "&t=" + Date.now(), {
             download: true,
             header: true,
             complete: function(results) {
-                if (results.data && results.data.length > 0) {
-                    parseData(results.data);
-                    renderBookInfo();
-                    document.getElementById('loading-overlay').style.display = 'none';
-                    switchView('view-cover');
-                } else {
-                    document.getElementById('loading-overlay').innerHTML = "<div style='color:#ef4444; font-weight:900;'>⚠️ 表格没数据，请检查链接！</div>";
-                }
-            },
-            error: function() {
-                document.getElementById('loading-overlay').innerHTML = "<div style='color:#ef4444; font-weight:900;'>⚠️ 网络错误或链接失效！</div>";
+                parseData(results.data);
+                renderBookInfo();
+                document.getElementById('loading-overlay').style.display = 'none';
+                switchView('view-cover');
             }
         });
     }
 
-    // 2. 解析 CSV 数据结构
     function parseData(rows) {
         rows.forEach(row => {
             const type = (row.Type || "").toUpperCase();
-            if (type === 'META') {
-                bookData.meta[row.Title] = row.Content;
-            } else if (type === 'CHAR') {
-                bookData.characters.push({ name: row.Title, intro: row.Content });
-            } else if (type === 'CHAPTER') {
-                bookData.chapters.push({ title: row.Title, content: row.Content });
-            }
+            if (type === 'META') bookData.meta[row.Title] = row.Content;
+            else if (type === 'CHAR') bookData.characters.push({ name: row.Title, intro: row.Content });
+            else if (type === 'CHAPTER') bookData.chapters.push({ title: row.Title, content: row.Content });
         });
     }
 
-    // 3. 渲染封面和目录
     function renderBookInfo() {
-        document.getElementById('display-title').innerText = bookData.meta['Title'] || "我的故事书";
+        document.getElementById('display-title').innerText = bookData.meta['Title'] || "载入中...";
         document.getElementById('display-desc').innerText = bookData.meta['Description'] || "";
-        document.getElementById('cover-pic').innerText = bookData.meta['Picture'] || "📘";
+        
+        // 🌟 后缀改为 .png
+        const coverImg = document.getElementById('display-cover-img');
+        const picMeta = bookData.meta['Picture'] || "b1"; 
+        coverImg.src = `./${picMeta}.png`; 
 
-        const charContainer = document.getElementById('display-chars');
-        if (bookData.characters.length === 0) {
-            document.querySelector('.char-section-title').style.display = 'none';
-        } else {
-            charContainer.innerHTML = bookData.characters.map(c => `
-                <div class="char-card">
-                    <div class="char-name">${c.name}</div>
-                    <div class="char-intro">${c.intro}</div>
-                </div>
-            `).join('');
-        }
+        document.getElementById('display-chars').innerHTML = bookData.characters.map(c => `
+            <div class="char-card">
+                <div class="char-name">${c.name}</div>
+                <div class="char-intro">${c.intro}</div>
+            </div>
+        `).join('');
 
-        const tocContainer = document.getElementById('display-toc');
-        tocContainer.innerHTML = bookData.chapters.map((ch, index) => `
-            <div class="toc-item" onclick="openChapter(${index})">
-                <span>${ch.title}</span>
-                <span style="color:#94a3b8; font-size:14px;">▶</span>
+        document.getElementById('display-toc').innerHTML = bookData.chapters.map((ch, i) => `
+            <div class="toc-item" onclick="openChapter(${i})">
+                <span>${ch.title}</span><span style="color:#94a3b8">▶</span>
             </div>
         `).join('');
     }
 
-    // 4. 视图切换
     function switchView(viewId) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(viewId).classList.add('active');
         window.scrollTo(0, 0);
     }
 
-    // 💡 5. 核心逻辑：处理换行符并生成完美段落
-    function formatStoryContent(rawText) {
-        // 使用正则同时匹配：真实的换行符(\n)、回车符(\r)、以及打出来的字符串"\n"
-        let textBlocks = rawText.split(/\\n|\r?\n/);
-        let finalHtml = "";
-        
-        textBlocks.forEach(block => {
-            let cleanBlock = block.trim();
-            // 只要这段不是空的，就把它包成一个 <p> 段落
-            if (cleanBlock.length > 0) {
-                // 调用拼音库给这一段加上注音标签
-                let pinyinHtml = pinyinPro.html(cleanBlock);
-                finalHtml += `<p>${pinyinHtml}</p>`;
-            }
-        });
-        
-        return finalHtml;
-    }
-
-    // 6. 打开章节
     function openChapter(index) {
         currentChapterIdx = index;
         const chapter = bookData.chapters[index];
         document.getElementById('chapter-name-ui').innerText = chapter.title;
         
-        // 调用我们刚刚写的神仙格式化函数
-        const formattedHtml = formatStoryContent(chapter.content);
-        document.getElementById('story-content').innerHTML = formattedHtml;
+        // 🌟 后缀改为 .png
+        const chapImg = document.getElementById('chapter-illustration');
+        const baseName = bookData.meta['Picture'] || "b1";
+        chapImg.src = `./${baseName}c${index + 1}.png`;
+
+        const textBlocks = chapter.content.split(/\\n|\r?\n/);
+        let finalHtml = "";
+        textBlocks.forEach(block => {
+            if (block.trim().length > 0) {
+                finalHtml += `<p>${pinyinPro.html(block)}</p>`;
+            }
+        });
+        document.getElementById('story-content').innerHTML = finalHtml;
         
-        // 绑定点击事件：点击 ruby 标签显示/隐藏拼音
         document.querySelectorAll('ruby').forEach(el => {
-            el.onclick = function() {
-                this.classList.toggle('show-py');
-            };
+            el.onclick = function() { this.classList.toggle('show-py'); };
         });
 
-        // 更新底部导航按钮状态
         document.getElementById('btn-prev-chap').disabled = (index === 0);
         document.getElementById('btn-next-chap').disabled = (index === bookData.chapters.length - 1);
-
         switchView('view-reading');
     }
 
     function moveChapter(step) {
         let newIdx = currentChapterIdx + step;
-        if (newIdx >= 0 && newIdx < bookData.chapters.length) {
-            openChapter(newIdx);
-        }
+        if (newIdx >= 0 && newIdx < bookData.chapters.length) openChapter(newIdx);
     }
 
     window.onload = loadBook;
 </script>
-
 </body>
 </html>
