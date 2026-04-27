@@ -263,13 +263,12 @@
         window.scrollTo(0, 0);
     }
 
-    // 💡 智能格式化：支持手动占位符 [图] 与 标点清洗
+  // 💡 智能格式化：无死角识别占位符 [图] 与 【图】
     function formatStoryContent(rawText, chapterIndex) {
         let textBlocks = rawText.split(/\\n|\r?\n/);
         let paragraphs = [];
-        let hasManualImg = false; // 记录用户是否自己指定了图片位置
+        let hasManualImg = false; // 记录是否手动放了图
         
-        // 提前准备好章节图片的 HTML
         const baseName = bookData.meta['Picture'] || "b1";
         const imgHtml = `<img src="./${baseName}c${chapterIndex + 1}.png" class="chapter-img-inline" onerror="this.style.display='none'">`;
         
@@ -277,11 +276,10 @@
             let cleanBlock = block.trim().replace(/\s+([，。！？、：；”》])/g, '$1').replace(/([“《])\s+/g, '$1');
             if (cleanBlock.length === 0) return;
 
-            // 🌟 黑科技：识别你在表格里打的 [图] 或 【图】
-            if (cleanBlock === '[图]' || cleanBlock === '【图】') {
-                paragraphs.push(imgHtml);
+            // 🌟 修复核心：无论占位符在句首、句中还是句尾，直接暴力替换成图片代码
+            if (cleanBlock.includes('[图]') || cleanBlock.includes('【图】')) {
                 hasManualImg = true;
-                return; // 这一行是图片，直接跳过下面的拼音处理
+                cleanBlock = cleanBlock.replace(/\[图\]|【图】/g, imgHtml);
             }
 
             let tempDiv = document.createElement('div');
@@ -313,10 +311,10 @@
 
         let finalHtml = "";
         if (hasManualImg) {
-            // ✅ 如果你打了 [图]，就完全按照你的排版来拼接
+            // 如果发现了手动标签，就原样输出
             finalHtml = paragraphs.join('');
         } else {
-            // 🔄 容错机制：如果你没打 [图]，系统默认插在第一段后面
+            // 容错：如果你忘了写标签，默认插在第一段后面
             if (paragraphs.length > 1) {
                 finalHtml = paragraphs[0] + imgHtml + paragraphs.slice(1).join('');
             } else {
