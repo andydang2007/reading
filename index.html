@@ -35,7 +35,6 @@
             display: flex; flex-direction: column;
         }
 
-        /* 视图动画 */
         .view { display: none; padding: 30px; animation: fadeIn 0.4s ease-out; }
         .view.active { display: flex; flex-direction: column; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -79,34 +78,43 @@
         }
         .toc-item:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; background: #eff6ff; color: #1d4ed8; border-color: #93c5fd;}
 
-        /* --- 4. 阅读页与排版规范 --- */
+        /* --- 4. 阅读页排版规范 --- */
         .reader-header { 
             position: sticky; top: 0; background: rgba(255,252,240,0.96); 
             padding: 15px 20px; border-bottom: 2px solid #e2e8f0; backdrop-filter: blur(8px);
             display: flex; justify-content: space-between; align-items: center; z-index: 100;
         }
-        #view-reading { padding-bottom: 150px; /* 防止 iOS 底部黑条挡住最后一行 */ }
+        #view-reading { padding-bottom: 150px; }
         
-        /* 🌟 修复插图：显示全图，不截取，加上合适的上下边距 */
         .chapter-img-inline { 
             width: 100%; height: auto; display: block;
             border-radius: 15px; margin: 10px 0 25px 0; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
 
+        /* 🌟 极致排版修复：彻底解决标点和字间距问题 */
         #story-content p {
-            font-size: 22px; line-height: 2.2; color: #1e293b; font-weight: 700;
-            /* 🌟 修复排版：改为左对齐，去除生硬的字间距，保留正常的字符间隔 */
-            text-align: left; 
-            text-indent: 2em; margin-bottom: 1.2em; letter-spacing: 1px;
-            /* 避头尾规则 */
-            word-break: normal; line-break: strict; 
+            font-size: 22px; 
+            line-height: 2.2; 
+            color: #1e293b; 
+            font-weight: 700;
+            margin-bottom: 1.2em; 
+            text-indent: 2em; /* 首行缩进两字 */
+            letter-spacing: 0.5px; /* 恢复自然字距 */
+            
+            /* 纸质书标准的左右对齐与避头尾规则 */
+            text-align: justify;
+            text-justify: inter-ideograph;
+            word-break: normal; 
+            line-break: strict; 
         }
 
-        /* --- 5. 悬浮拼音黑科技 --- */
+        /* 💡 修复汉字节点，回归普通文本属性 */
         .hz { 
-            cursor: pointer; transition: 0.2s; display: inline-block; 
-            border-radius: 4px; padding: 0 2px; margin: 0 -2px; 
+            cursor: pointer; 
+            transition: background 0.2s, color 0.2s; 
+            border-radius: 4px;
+            /* 去掉了 display: inline-block 解决所有排版灾难 */
         }
         b { color: #e11d48; border-bottom: 3px dashed #fecaca; }
 
@@ -217,7 +225,6 @@
         });
     }
 
-    // 精确读取你上传的人物头像 (ly.png, lj.png)
     function getAvatarName(name) {
         if(name.includes("悦")) return "ly";
         if(name.includes("静")) return "lj";
@@ -229,15 +236,12 @@
         const bTitle = bookData.meta['Title'] || "我的书";
         const bPic = bookData.meta['Picture'] || "b1";
 
-        // 书架赋值
         document.getElementById('shelf-title').innerText = bTitle;
         document.getElementById('shelf-cover-img').src = `./${bPic}.png`;
         
-        // 扉页赋值
         document.getElementById('display-title').innerText = bTitle;
         document.getElementById('display-desc').innerText = bookData.meta['Description'] || "";
 
-        // 人物卡片赋值 
         document.getElementById('display-chars').innerHTML = bookData.characters.map(c => `
             <div class="char-card">
                 <img src="./${getAvatarName(c.name)}.png" class="char-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'none\\' viewBox=\\'0 0 24 24\\' stroke=\\'%2394a3b8\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\\'/></svg>'">
@@ -248,7 +252,6 @@
             </div>
         `).join('');
 
-        // 目录赋值
         document.getElementById('display-toc').innerHTML = bookData.chapters.map((ch, i) => `
             <div class="toc-item" onclick="openChapter(${i})">${ch.title}</div>
         `).join('');
@@ -260,14 +263,13 @@
         window.scrollTo(0, 0);
     }
 
-    // 💡 智能格式化：文本清洗与插图自动注入
     function formatStoryContent(rawText, chapterIndex) {
         let textBlocks = rawText.split(/\\n|\r?\n/);
         let paragraphs = [];
         
         textBlocks.forEach(block => {
-            // 完美清洗标点前多余的空格
-            let cleanBlock = block.trim().replace(/\s+([，。！？、：；”》])/g, '$1');
+            // 精确替换标点符号周围的空格
+            let cleanBlock = block.trim().replace(/\s+([，。！？、：；”》])/g, '$1').replace(/([“《])\s+/g, '$1');
             if (cleanBlock.length === 0) return;
 
             let tempDiv = document.createElement('div');
@@ -297,16 +299,13 @@
             paragraphs.push(`<p>${tempDiv.innerHTML}</p>`);
         });
 
-        // 🌟 自动生成章节图片，并插在第一段文字的后面！
         const baseName = bookData.meta['Picture'] || "b1";
         const imgHtml = `<img src="./${baseName}c${chapterIndex + 1}.png" class="chapter-img-inline" onerror="this.style.display='none'">`;
         
         let finalHtml = "";
         if (paragraphs.length > 1) {
-            // 内联显示：插在第一段和第二段之间
             finalHtml = paragraphs[0] + imgHtml + paragraphs.slice(1).join('');
         } else {
-            // 如果这章只有一段话，就乖乖放上面
             finalHtml = imgHtml + (paragraphs[0] || "");
         }
         
@@ -322,10 +321,8 @@
         const chapter = bookData.chapters[index];
         document.getElementById('chapter-name-ui').innerText = chapter.title;
         
-        // 渲染文本和内联插图
         document.getElementById('story-content').innerHTML = formatStoryContent(chapter.content, index);
         
-        // 💡 悬浮拼音事件绑定
         document.querySelectorAll('.hz').forEach(el => {
             const show = (e) => {
                 if(e && e.type === 'touchstart') e.preventDefault();
