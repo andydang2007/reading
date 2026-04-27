@@ -90,21 +90,46 @@
             letter-spacing: 1px; /* 舒适的字间距 */
         }
 
-        /* 💡 拼音核心 CSS */
+        /* 💡 拼音核心 CSS（修复字间距完美版） */
         ruby { 
             cursor: pointer; 
-            ruby-align: center;
+            position: relative; /* 让拼音以汉字为基准定位 */
+            display: inline-block; /* 破坏原生 ruby 的撑开特性 */
+            text-decoration: none;
         }
         rt { 
             opacity: 0; 
+            position: absolute; /* 🌟 绝对定位！悬浮在空中，不再占用任何宽度 */
+            left: 50%;
+            bottom: 85%; /* 悬浮在汉字上方 */
+            transform: translateX(-50%);
+            white-space: nowrap; /* 保证拼音不会换行 */
             font-size: 0.6em; 
             color: var(--pinyin-color); 
             font-family: 'Comic Sans MS', sans-serif; 
             font-weight: 900;
-            transition: opacity 0.2s ease-in-out;
+            transition: opacity 0.2s ease-in-out, transform 0.2s;
             user-select: none;
+            pointer-events: none; /* 鼠标点不中拼音，只点中汉字 */
         }
-        ruby.show-py rt { opacity: 1; }
+        rp { display: none; } /* 隐藏原生拼音库生成的括号 */
+        
+        ruby.show-py rt { 
+            opacity: 1; 
+            transform: translateX(-50%) translateY(-4px); /* 浮现时带一点向上的微动效 */
+        }
+        
+        /* 稍微把正文的字间距拉宽一点点，阅读更舒服，也避免拼音打架 */
+        #story-content p {
+            font-size: 22px; 
+            line-height: 2.2; 
+            color: #1e293b;
+            font-weight: 700;
+            text-align: justify;
+            text-indent: 2em; 
+            margin-bottom: 1.2em; 
+            letter-spacing: 2px; /* 🌟 字间距从 1px 改为 2px */
+        }
 
         /* 重点生词样式 */
         b { 
