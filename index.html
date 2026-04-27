@@ -263,14 +263,26 @@
         window.scrollTo(0, 0);
     }
 
+    // 💡 智能格式化：支持手动占位符 [图] 与 标点清洗
     function formatStoryContent(rawText, chapterIndex) {
         let textBlocks = rawText.split(/\\n|\r?\n/);
         let paragraphs = [];
+        let hasManualImg = false; // 记录用户是否自己指定了图片位置
+        
+        // 提前准备好章节图片的 HTML
+        const baseName = bookData.meta['Picture'] || "b1";
+        const imgHtml = `<img src="./${baseName}c${chapterIndex + 1}.png" class="chapter-img-inline" onerror="this.style.display='none'">`;
         
         textBlocks.forEach(block => {
-            // 精确替换标点符号周围的空格
             let cleanBlock = block.trim().replace(/\s+([，。！？、：；”》])/g, '$1').replace(/([“《])\s+/g, '$1');
             if (cleanBlock.length === 0) return;
+
+            // 🌟 黑科技：识别你在表格里打的 [图] 或 【图】
+            if (cleanBlock === '[图]' || cleanBlock === '【图】') {
+                paragraphs.push(imgHtml);
+                hasManualImg = true;
+                return; // 这一行是图片，直接跳过下面的拼音处理
+            }
 
             let tempDiv = document.createElement('div');
             tempDiv.innerHTML = cleanBlock;
@@ -299,14 +311,17 @@
             paragraphs.push(`<p>${tempDiv.innerHTML}</p>`);
         });
 
-        const baseName = bookData.meta['Picture'] || "b1";
-        const imgHtml = `<img src="./${baseName}c${chapterIndex + 1}.png" class="chapter-img-inline" onerror="this.style.display='none'">`;
-        
         let finalHtml = "";
-        if (paragraphs.length > 1) {
-            finalHtml = paragraphs[0] + imgHtml + paragraphs.slice(1).join('');
+        if (hasManualImg) {
+            // ✅ 如果你打了 [图]，就完全按照你的排版来拼接
+            finalHtml = paragraphs.join('');
         } else {
-            finalHtml = imgHtml + (paragraphs[0] || "");
+            // 🔄 容错机制：如果你没打 [图]，系统默认插在第一段后面
+            if (paragraphs.length > 1) {
+                finalHtml = paragraphs[0] + imgHtml + paragraphs.slice(1).join('');
+            } else {
+                finalHtml = imgHtml + (paragraphs[0] || "");
+            }
         }
         
         return finalHtml;
