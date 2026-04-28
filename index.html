@@ -44,56 +44,50 @@
         #view-bookshelf { align-items: center; padding-top: 8vh; background: #f8fafc; }
         .shelf-title-ui { font-weight: 900; color: #0f172a; font-size: 32px; margin-bottom: 40px; }
         .book-spine { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; }
-        .book-spine:active { transform: scale(0.95); }
-        .spine-img { 
-            width: 160px; height: 220px; object-fit: cover; 
-            border-radius: 8px 15px 15px 8px; border: 2px solid white;
-            box-shadow: -5px 15px 25px rgba(0,0,0,0.15), inset 4px 0 10px rgba(255,255,255,0.5); margin-bottom: 15px; 
-        }
-        .spine-title { font-weight: 900; font-size: 16px; color: #334155; text-align: center; max-width: 160px; line-height: 1.3;}
+        .spine-img { width: 160px; height: 220px; object-fit: cover; border-radius: 8px 15px 15px 8px; border: 2px solid white; box-shadow: -5px 15px 25px rgba(0,0,0,0.15); margin-bottom: 15px; }
 
         /* 扉页 */
         #view-cover { align-items: center; text-align: center; padding-top: 6vh; }
-        .book-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 42px; color: #0f172a; margin: 0 0 15px 0; line-height: 1.2; }
-        .book-desc { font-size: 18px; color: #64748b; margin-bottom: 40px; max-width: 90%; font-weight: 800; line-height: 1.6;}
+        .book-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 42px; color: #0f172a; margin: 0 0 15px 0; }
         
-        .char-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px; margin-bottom: 40px; }
-        .char-card { background: white; padding: 15px 20px; border-radius: 20px; border: 3px solid #e2e8f0; text-align: left; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
-        .char-avatar { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #bae6fd; flex-shrink: 0; background: #f1f5f9; }
-        .char-info { flex: 1; }
-        .char-name { font-weight: 900; font-size: 20px; color: var(--accent); margin-bottom: 4px; }
-        .char-intro { font-size: 15px; color: #475569; line-height: 1.5; font-weight: 700; }
-
-        /* 目录 */
-        .toc-item { background: white; padding: 20px; border-radius: 18px; border: 2px solid #e2e8f0; cursor: pointer; font-weight: 900; font-size: 18px; margin-bottom: 15px; transition: 0.2s; box-shadow: 0 4px 0 #cbd5e1; text-align: center; color: #1e293b; }
-        .toc-item:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; background: #eff6ff; color: #1d4ed8; border-color: #93c5fd;}
+        /* 🌟 目录页：两列紧凑模式优化 */
+        #display-toc {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 强制两列并排 */
+            gap: 12px;
+            padding: 10px 0;
+        }
+        .toc-item { 
+            background: white; 
+            padding: 12px 10px; /* 缩小内边距 */
+            border-radius: 12px; 
+            border: 2px solid #e2e8f0; 
+            cursor: pointer; 
+            font-weight: 900; 
+            font-size: 15px; /* 稍微缩小字体 */
+            transition: 0.2s; 
+            box-shadow: 0 3px 0 #cbd5e1; 
+            text-align: center; 
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* 文字过长显示省略号，保持整齐 */
+        }
+        .toc-item:active { transform: translateY(3px); box-shadow: 0 0 0 transparent; background: #eff6ff; }
 
         /* 阅读页 */
         .reader-header { position: sticky; top: 0; background: rgba(255,252,240,0.96); padding: 15px 20px; border-bottom: 2px solid #e2e8f0; backdrop-filter: blur(8px); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        #view-reading { padding-bottom: 150px; }
-        
-        /* 画框样式 */
-        .chapter-img-inline { 
-            width: 100%; height: auto; display: block;
-            border-radius: 15px; margin: 10px 0 25px 0; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 4px solid white;
-            background-color: #e2e8f0; /* 加上底色，没加载出来时不至于瞎白 */
-        }
+        .chapter-img-inline { width: 100%; height: auto; display: block; border-radius: 15px; margin: 10px 0 25px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 4px solid white; background-color: #f1f5f9; }
+        #story-content p { font-size: 22px; line-height: 2.2; color: #1e293b; font-weight: 700; margin-bottom: 1.2em; text-indent: 2em; letter-spacing: 0.5px; text-align: justify; }
 
-        #story-content p { font-size: 22px; line-height: 2.2; color: #1e293b; font-weight: 700; margin-bottom: 1.2em; text-indent: 2em; letter-spacing: 0.5px; text-align: justify; text-justify: inter-ideograph; word-break: normal; line-break: strict; }
+        .hz { cursor: pointer; border-radius: 4px; }
+        #pinyin-floating-window { position: fixed; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.98); border: 4px solid var(--accent); border-radius: 20px; padding: 10px 25px; font-size: 38px; font-family: 'Comic Sans MS', sans-serif; font-weight: 900; color: #f59e0b; box-shadow: 0 10px 30px rgba(0,0,0,0.15); opacity: 0; z-index: 9999; pointer-events: none; }
 
-        .hz { cursor: pointer; transition: background 0.2s, color 0.2s; border-radius: 4px; }
-        b { color: #e11d48; border-bottom: 3px dashed #fecaca; }
-
-        #pinyin-floating-window { position: fixed; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.98); border: 4px solid var(--accent); border-radius: 20px; padding: 10px 25px; font-size: 38px; font-family: 'Comic Sans MS', sans-serif; font-weight: 900; color: #f59e0b; box-shadow: 0 10px 30px rgba(0,0,0,0.15); opacity: 0; transform: translateY(-10px); transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; pointer-events: none; }
-
-        /* 底部导航 */
         .nav-footer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 800px; background: white; padding: 15px 25px; display: flex; gap: 15px; border-top: 2px solid #e2e8f0; box-shadow: 0 -10px 20px rgba(0,0,0,0.03); }
-        .btn-footer { flex: 1; padding: 16px; border-radius: 18px; border: none; font-weight: 900; cursor: pointer; font-size: 18px; box-shadow: 0 5px 0 rgba(0,0,0,0.1); transition: 0.1s;}
-        .btn-footer:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
+        .btn-footer { flex: 1; padding: 16px; border-radius: 18px; border: none; font-weight: 900; cursor: pointer; font-size: 18px; box-shadow: 0 5px 0 rgba(0,0,0,0.1); }
+        .btn-footer:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-prev { background: #f1f5f9; color: #64748b; border: 3px solid #e2e8f0; box-shadow: 0 5px 0 #cbd5e1; }
         .btn-next { background: var(--accent); color: white; box-shadow: 0 5px 0 #2563eb; }
-        .btn-footer:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
     </style>
 </head>
 <body>
@@ -123,8 +117,8 @@
         </div>
 
         <div id="view-toc" class="view">
-            <header style="display:flex; align-items:center; margin-bottom:30px;">
-                <button onclick="switchView('view-cover')" style="border:none; background:none; font-weight:900; color:var(--accent); font-size:18px; cursor:pointer;">← 扉页</button>
+            <header style="display:flex; align-items:center; margin-bottom:20px;">
+                <button onclick="switchView('view-cover')" style="border:none; background:none; font-weight:900; color:var(--accent); font-size:16px; cursor:pointer;">← 扉页</button>
                 <h2 style="margin:0 auto; padding-right:50px; font-weight:900;">目录</h2>
             </header>
             <div id="display-toc"></div>
@@ -132,15 +126,13 @@
 
         <div id="view-reading" class="view">
             <header class="reader-header">
-                <button onclick="switchView('view-toc')" class="btn-footer" style="flex:none; width:80px; padding:8px; font-size:14px; background:#f1f5f9; border: 2px solid #e2e8f0; box-shadow:0 3px 0 #cbd5e1;">⬅ 目录</button>
-                <span id="chapter-name-ui" style="font-weight:900; font-size: 18px;">章节</span>
+                <button onclick="switchView('view-toc')" class="btn-footer" style="flex:none; width:80px; padding:8px; font-size:13px; background:#f1f5f9; border: 2px solid #e2e8f0; box-shadow:0 3px 0 #cbd5e1;">⬅ 目录</button>
+                <span id="chapter-name-ui" style="font-weight:900; font-size: 17px;">章节</span>
                 <div style="width:80px;"></div>
             </header>
-            
             <div style="margin-top:20px;">
                 <div id="story-content"></div>
             </div>
-
             <footer class="nav-footer">
                 <button class="btn-footer btn-prev" id="btn-prev-chap" onclick="moveChapter(-1)">上一章</button>
                 <button class="btn-footer btn-next" id="btn-next-chap" onclick="moveChapter(1)">下一章</button>
@@ -150,93 +142,53 @@
 
 <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-jsRDCZ56umRMvsaZiXPJbGYAxWEzq3kQ7Fv4JjPg3f1zhAU8uDL_HE6ZCFDOnTfJ7n81Ei0VLIWe/pub?gid=0&single=true&output=csv";
-    
     let bookData = { meta: {}, characters: [], chapters: [] };
     let currentChapterIdx = 0;
 
     async function loadBook() {
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-            if (typeof Papa === 'undefined') throw new Error("解析组件被拦截，请刷新重试！");
-            if (typeof pinyinPro === 'undefined') throw new Error("拼音库被拦截，请刷新重试！");
-
-            const res = await fetch(CSV_URL + "&v=" + Date.now(), { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (!res.ok) throw new Error("网络请求失败，状态码：" + res.status);
+            const res = await fetch(CSV_URL + "&v=" + Date.now());
             const csvText = await res.text();
-
             Papa.parse(csvText, {
                 header: true,
                 transformHeader: h => h.replace(/^\uFEFF/, '').trim(),
                 complete: function(results) {
-                    if (results.data && results.data.length > 0) {
-                        parseData(results.data);
-                        renderBookInfo();
-                        document.getElementById('loading-overlay').style.display = 'none';
-                        switchView('view-bookshelf'); 
-                    } else {
-                        throw new Error("表格解析为空，请检查链接内容");
-                    }
+                    parseData(results.data);
+                    renderBookInfo();
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    switchView('view-bookshelf'); 
                 }
             });
-        } catch (e) {
-            let errorMsg = e.message;
-            if (e.name === 'AbortError') errorMsg = "网络连接太慢了，取书超时！";
-            document.getElementById('loading-overlay').innerHTML = `
-                <div style="font-size: 50px; margin-bottom: 20px;">🚨</div>
-                <div style="font-weight: 900; color: #ef4444; font-size: 20px; margin-bottom: 10px;">载入失败</div>
-                <div style="color: #475569; font-size: 14px; background: white; padding: 15px; border-radius: 10px; max-width: 80%; word-break: break-all;">${errorMsg}</div>
-                <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; border-radius: 10px; background: #3b82f6; color: white; font-weight: 900; border: none;">重新尝试</button>
-            `;
-        }
+        } catch (e) { document.getElementById('loading-text').innerText = "加载失败，请检查网络。"; }
     }
 
     function parseData(rows) {
         rows.forEach(row => {
             const type = (row.Type || row.TYPE || "").toUpperCase();
-            const title = row.Title || row.TITLE || "";
-            const content = row.Content || row.CONTENT || "";
-            const media = row.Media || row.MEDIA || ""; 
-
-            if (type === 'META') bookData.meta[title] = content;
-            else if (type === 'CHAR') bookData.characters.push({ name: title, intro: content });
-            else if (type === 'CHAPTER') bookData.chapters.push({ title: title, content: content, media: media });
+            if (type === 'META') bookData.meta[row.Title] = row.Content;
+            else if (type === 'CHAR') bookData.characters.push({ name: row.Title, intro: row.Content });
+            else if (type === 'CHAPTER') bookData.chapters.push({ title: row.Title, content: row.Content, media: row.Media });
         });
-    }
-
-    function getAvatarName(name) {
-        if(name.includes("悦")) return "ly";
-        if(name.includes("静")) return "lj";
-        try { return pinyinPro.pinyin(name, { pattern: 'first', toneType: 'none', type: 'array' }).join(''); } 
-        catch(e) { return "avatar"; }
     }
 
     function renderBookInfo() {
         const bTitle = bookData.meta['Title'] || "我的书";
         const bPic = bookData.meta['Picture'] || "b1";
-
         document.getElementById('shelf-title').innerText = bTitle;
         document.getElementById('shelf-cover-img').src = `./${bPic}.png`;
-        
         document.getElementById('display-title').innerText = bTitle;
         document.getElementById('display-desc').innerText = bookData.meta['Description'] || "";
 
         document.getElementById('display-chars').innerHTML = bookData.characters.map(c => `
             <div class="char-card">
-                <img src="./${getAvatarName(c.name)}.png" class="char-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'none\\' viewBox=\\'0 0 24 24\\' stroke=\\'%2394a3b8\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\\'/></svg>'">
                 <div class="char-info">
                     <div class="char-name">${c.name}</div>
                     <div class="char-intro">${c.intro}</div>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
 
         document.getElementById('display-toc').innerHTML = bookData.chapters.map((ch, i) => `
-            <div class="toc-item" onclick="openChapter(${i})">${ch.title}</div>
-        `).join('');
+            <div class="toc-item" onclick="openChapter(${i})">${ch.title}</div>`).join('');
     }
 
     function switchView(viewId) {
@@ -245,32 +197,34 @@
         window.scrollTo(0, 0);
     }
 
-    // 🌟 核心升级：把多媒体生成逻辑和正文排版合为一体
+    // 🌟 修复版排版引擎：完美处理 视频、Media插画、以及自动命名的Png图
     function formatStoryContent(rawText, chapterIndex, mediaUrl) {
         let textBlocks = rawText.split(/\\n|\r?\n/);
         let paragraphs = [];
         let hasManualImg = false; 
         
-        // 1. 生成属于这一章的多媒体代码
+        // 1. 智能判定媒体代码
         let mediaHtml = "";
         if (mediaUrl && mediaUrl.trim() !== "") {
+            // A. 如果 Media 列有东西，就用那一列
             const url = mediaUrl.trim();
             if (url.match(/\.(mp4|webm|mov)$/i) || url.includes("video")) {
-                mediaHtml = `<video src="${url}" autoplay loop muted playsinline 
-                           class="chapter-img-inline" style="cursor:pointer;"
-                           onclick="if(this.paused){this.play(); this.muted=false;}else{this.pause();}">
-                    </video>`;
+                mediaHtml = `<video src="${url}" autoplay loop muted playsinline class="chapter-img-inline" style="cursor:pointer;" onclick="if(this.paused){this.play(); this.muted=false;}else{this.pause();}"></video>`;
             } else {
                 mediaHtml = `<img src="${url}" class="chapter-img-inline" onerror="this.style.display='none'">`;
             }
+        } else {
+            // B. 如果 Media 列是空的，回退到自动寻找Png插图的老规则
+            const baseName = bookData.meta['Picture'] || "b1";
+            const fallbackImg = `./${baseName}c${chapterIndex + 1}.png`;
+            mediaHtml = `<img src="${fallbackImg}" class="chapter-img-inline" onerror="this.style.display='none'">`;
         }
 
-        // 2. 逐段处理文字，寻找占位符
+        // 2. 替换 [图] 占位符
         textBlocks.forEach(block => {
-            let cleanBlock = block.trim().replace(/\s+([，。！？、：；”》])/g, '$1').replace(/([“《])\s+/g, '$1');
+            let cleanBlock = block.trim();
             if (cleanBlock.length === 0) return;
 
-            // 🎯 如果发现占位符，直接把视频/图片代码塞进去
             if (cleanBlock.includes('[图]') || cleanBlock.includes('【图】')) {
                 hasManualImg = true;
                 cleanBlock = cleanBlock.replace(/\[图\]|【图】/g, mediaHtml);
@@ -279,30 +233,22 @@
             let tempDiv = document.createElement('div');
             tempDiv.innerHTML = cleanBlock;
             
-            // 拼音注入逻辑（小心避开图片和视频标签）
             function processNode(node) {
                 if (node.nodeType === 3) { 
                     let text = node.nodeValue;
-                    let pyArray = typeof pinyinPro !== 'undefined' ? pinyinPro.pinyin(text, { type: 'array' }) : Array(text.length).fill(''); 
+                    let pyArray = pinyinPro.pinyin(text, { type: 'array' }); 
                     let newHtml = "";
                     for(let i=0; i<text.length; i++) {
                         let char = text[i];
                         if(/[\u4e00-\u9fa5]/.test(char)) {
                             newHtml += `<span class="hz" data-py="${pyArray[i]}">${char}</span>`;
-                        } else {
-                            newHtml += char;
-                        }
+                        } else { newHtml += char; }
                     }
                     let wrapper = document.createElement('span');
                     wrapper.innerHTML = newHtml;
-                    
-                    while (wrapper.firstChild) {
-                        node.parentNode.insertBefore(wrapper.firstChild, node);
-                    }
+                    while (wrapper.firstChild) { node.parentNode.insertBefore(wrapper.firstChild, node); }
                     node.parentNode.removeChild(node);
-
                 } else if (node.nodeType === 1) { 
-                    // 💡 保护机制：如果是媒体标签，千万不要对它加拼音！
                     if (node.tagName === 'VIDEO' || node.tagName === 'IMG') return;
                     Array.from(node.childNodes).forEach(processNode);
                 }
@@ -311,66 +257,41 @@
             paragraphs.push(`<p>${tempDiv.innerHTML}</p>`);
         });
 
-        // 3. 容错拼装：即使忘了写[图]，也不浪费视频
         let finalHtml = "";
         if (hasManualImg) {
             finalHtml = paragraphs.join('');
         } else {
-            if (mediaHtml !== "") {
-                if (paragraphs.length > 1) {
-                    finalHtml = paragraphs[0] + mediaHtml + paragraphs.slice(1).join('');
-                } else {
-                    finalHtml = mediaHtml + (paragraphs[0] || "");
-                }
+            // 如果全文没敲 [图]，默认插在第二段前面（作为展示图）
+            if (paragraphs.length > 1) {
+                finalHtml = paragraphs[0] + mediaHtml + paragraphs.slice(1).join('');
             } else {
-                finalHtml = paragraphs.join('');
+                finalHtml = mediaHtml + (paragraphs[0] || "");
             }
         }
         return finalHtml;
     }
 
     const pinyinWin = document.getElementById('pinyin-floating-window');
-    let pressTimer = null;
-    let isPressing = false;
-
     function openChapter(index) {
         currentChapterIdx = index;
         const chapter = bookData.chapters[index];
         document.getElementById('chapter-name-ui').innerText = chapter.title;
-        
-        // 🌟 直接调用排版引擎（顶部的空盒子已经被去掉了）
         document.getElementById('story-content').innerHTML = formatStoryContent(chapter.content, index, chapter.media);
         
         document.querySelectorAll('.hz').forEach(el => {
             const show = (e) => {
                 if(e && e.type === 'touchstart') e.preventDefault();
-                isPressing = true;
-                pressTimer = setTimeout(() => {
-                    if (isPressing) {
-                        pinyinWin.innerText = el.getAttribute('data-py');
-                        pinyinWin.style.opacity = '1';
-                        pinyinWin.style.transform = 'translateY(0)';
-                        el.style.color = 'var(--accent)';
-                        el.style.background = '#e0f2fe';
-                    }
-                }, 150); 
+                pinyinWin.innerText = el.getAttribute('data-py');
+                pinyinWin.style.opacity = '1';
+                el.style.color = 'var(--accent)';
+                el.style.background = '#e0f2fe';
             };
-            
             const hide = () => {
-                isPressing = false;
-                clearTimeout(pressTimer);
                 pinyinWin.style.opacity = '0';
-                pinyinWin.style.transform = 'translateY(-10px)';
-                el.style.color = '';
-                el.style.background = '';
+                el.style.color = ''; el.style.background = '';
             };
-
-            el.addEventListener('touchstart', show, {passive: false});
-            el.addEventListener('touchend', hide);
-            el.addEventListener('touchcancel', hide);
-            el.addEventListener('mousedown', show);
-            el.addEventListener('mouseup', hide);
-            el.addEventListener('mouseleave', hide);
+            el.addEventListener('touchstart', show); el.addEventListener('touchend', hide);
+            el.addEventListener('mousedown', show); el.addEventListener('mouseup', hide);
         });
 
         document.getElementById('btn-prev-chap').disabled = (index === 0);
@@ -382,7 +303,6 @@
         let newIdx = currentChapterIdx + step;
         if (newIdx >= 0 && newIdx < bookData.chapters.length) openChapter(newIdx);
     }
-
     document.addEventListener('DOMContentLoaded', loadBook);
 </script>
 </body>
