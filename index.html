@@ -89,32 +89,27 @@
         .chapter-img-inline { 
             width: 100%; height: auto; display: block;
             border-radius: 15px; margin: 10px 0 25px 0; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 4px solid white;
         }
 
-        /* 🌟 极致排版修复：彻底解决标点和字间距问题 */
         #story-content p {
             font-size: 22px; 
             line-height: 2.2; 
             color: #1e293b; 
             font-weight: 700;
             margin-bottom: 1.2em; 
-            text-indent: 2em; /* 首行缩进两字 */
-            letter-spacing: 0.5px; /* 恢复自然字距 */
-            
-            /* 纸质书标准的左右对齐与避头尾规则 */
+            text-indent: 2em; 
+            letter-spacing: 0.5px; 
             text-align: justify;
             text-justify: inter-ideograph;
             word-break: normal; 
             line-break: strict; 
         }
 
-        /* 💡 修复汉字节点，回归普通文本属性 */
         .hz { 
             cursor: pointer; 
             transition: background 0.2s, color 0.2s; 
             border-radius: 4px;
-            /* 去掉了 display: inline-block 解决所有排版灾难 */
         }
         b { color: #e11d48; border-bottom: 3px dashed #fecaca; }
 
@@ -150,7 +145,7 @@
 
     <div id="loading-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--paper-bg); z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <div style="font-size: 50px; animation: float 2s infinite alternate;">📖</div>
-        <div style="font-weight:900; color:#3b82f6; margin-top:20px;">正在从云端图书馆取书...</div>
+        <div id="loading-text" style="font-weight:900; color:#3b82f6; margin-top:20px; font-size: 20px;">正在从云端图书馆取书...</div>
     </div>
 
     <div class="phone-container">
@@ -187,6 +182,7 @@
             </header>
             
             <div style="margin-top:20px;">
+                <div id="media-container" style="display: none; width: 100%;"></div>
                 <div id="story-content"></div>
             </div>
 
@@ -203,25 +199,51 @@
     let bookData = { meta: {}, characters: [], chapters: [] };
     let currentChapterIdx = 0;
 
+    // 💡 强力下载引擎：用 fetch 代替 Papa.parse 的直接下载，解决所有设备的跨域拦截！
     async function loadBook() {
-        Papa.parse(CSV_URL + "&t=" + Date.now(), {
-            download: true,
-            header: true,
-            complete: function(results) {
-                parseData(results.data);
-                renderBookInfo();
-                document.getElementById('loading-overlay').style.display = 'none';
-                switchView('view-bookshelf'); 
-            }
-        });
+        try {
+            if (typeof Papa === 'undefined') throw new Error("PapaParse 组件被拦截");
+            if (typeof pinyinPro === 'undefined') throw new Error("拼音库加载失败");
+
+            const res = await fetch(CSV_URL + "&t=" + Date.now());
+            if (!res.ok) throw new Error("网络请求失败，状态码：" + res.status);
+            const csvText = await res.text();
+
+            Papa.parse(csvText, {
+                header: true,
+                transformHeader: h => h.replace(/^\uFEFF/, '').trim(),
+                complete: function(results) {
+                    if (results.data && results.data.length > 0) {
+                        parseData(results.data);
+                        renderBookInfo();
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        switchView('view-bookshelf'); 
+                    } else {
+                        throw new Error("表格解析为空，请检查链接内容");
+                    }
+                }
+            });
+        } catch (e) {
+            // 如果出错，绝不卡死，直接把原因弹出来！
+            document.getElementById('loading-overlay').innerHTML = `
+                <div style="font-size: 50px; margin-bottom: 20px;">🚨</div>
+                <div style="font-weight: 900; color: #ef4444; font-size: 20px; margin-bottom: 10px;">载入失败</div>
+                <div style="color: #475569; font-size: 14px; background: white; padding: 15px; border-radius: 10px; max-width: 80%; word-break: break-all;">${e.message}</div>
+                <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; border-radius: 10px; background: #3b82f6; color: white; font-weight: 900; border: none;">重新尝试</button>
+            `;
+        }
     }
 
     function parseData(rows) {
         rows.forEach(row => {
-            const type = (row.Type || "").toUpperCase();
-            if (type === 'META') bookData.meta[row.Title] = row.Content;
-            else if (type === 'CHAR') bookData.characters.push({ name: row.Title, intro: row.Content });
-            else if (type === 'CHAPTER') bookData.chapters.push({ title: row.Title, content: row.Content });
+            const type = (row.Type || row.TYPE || "").toUpperCase();
+            const title = row.Title || row.TITLE || "";
+            const content = row.Content || row.CONTENT || "";
+            const media = row.Media || row.MEDIA || ""; 
+
+            if (type === 'META') bookData.meta[title] = content;
+            else if (type === 'CHAR') bookData.characters.push({ name: title, intro: content });
+            else if (type === 'CHAPTER') bookData.chapters.push({ title: title, content: content, media: media });
         });
     }
 
@@ -263,11 +285,10 @@
         window.scrollTo(0, 0);
     }
 
-  // 💡 智能格式化：无死角识别占位符 [图] 与 【图】
     function formatStoryContent(rawText, chapterIndex) {
         let textBlocks = rawText.split(/\\n|\r?\n/);
         let paragraphs = [];
-        let hasManualImg = false; // 记录是否手动放了图
+        let hasManualImg = false; 
         
         const baseName = bookData.meta['Picture'] || "b1";
         const imgHtml = `<img src="./${baseName}c${chapterIndex + 1}.png" class="chapter-img-inline" onerror="this.style.display='none'">`;
@@ -276,7 +297,6 @@
             let cleanBlock = block.trim().replace(/\s+([，。！？、：；”》])/g, '$1').replace(/([“《])\s+/g, '$1');
             if (cleanBlock.length === 0) return;
 
-            // 🌟 修复核心：无论占位符在句首、句中还是句尾，直接暴力替换成图片代码
             if (cleanBlock.includes('[图]') || cleanBlock.includes('【图】')) {
                 hasManualImg = true;
                 cleanBlock = cleanBlock.replace(/\[图\]|【图】/g, imgHtml);
@@ -300,7 +320,13 @@
                     }
                     let wrapper = document.createElement('span');
                     wrapper.innerHTML = newHtml;
-                    node.replaceWith(...wrapper.childNodes);
+                    
+                    // 💡 修复：绝对兼容的 DOM 节点替换法（取代会崩溃的 replaceWith）
+                    while (wrapper.firstChild) {
+                        node.parentNode.insertBefore(wrapper.firstChild, node);
+                    }
+                    node.parentNode.removeChild(node);
+
                 } else if (node.nodeType === 1) { 
                     Array.from(node.childNodes).forEach(processNode);
                 }
@@ -311,17 +337,14 @@
 
         let finalHtml = "";
         if (hasManualImg) {
-            // 如果发现了手动标签，就原样输出
             finalHtml = paragraphs.join('');
         } else {
-            // 容错：如果你忘了写标签，默认插在第一段后面
             if (paragraphs.length > 1) {
                 finalHtml = paragraphs[0] + imgHtml + paragraphs.slice(1).join('');
             } else {
                 finalHtml = imgHtml + (paragraphs[0] || "");
             }
         }
-        
         return finalHtml;
     }
 
@@ -334,6 +357,25 @@
         const chapter = bookData.chapters[index];
         document.getElementById('chapter-name-ui').innerText = chapter.title;
         
+        // 💡 多媒体兼容：无缝加载 Banana 的神奇视频或插画！
+        const mediaBox = document.getElementById('media-container');
+        if (chapter.media && chapter.media.trim() !== "") {
+            const url = chapter.media.trim();
+            if (url.match(/\.(mp4|webm|mov)$/i) || url.includes("video")) {
+                mediaBox.innerHTML = `
+                    <video src="${url}" autoplay loop muted playsinline 
+                           class="chapter-img-inline" style="cursor:pointer;"
+                           onclick="if(this.paused){this.play(); this.muted=false;}else{this.pause();}">
+                    </video>`;
+            } else {
+                mediaBox.innerHTML = `<img src="${url}" class="chapter-img-inline">`;
+            }
+            mediaBox.style.display = 'block';
+        } else {
+            mediaBox.style.display = 'none';
+            mediaBox.innerHTML = '';
+        }
+
         document.getElementById('story-content').innerHTML = formatStoryContent(chapter.content, index);
         
         document.querySelectorAll('.hz').forEach(el => {
@@ -363,7 +405,6 @@
             el.addEventListener('touchstart', show, {passive: false});
             el.addEventListener('touchend', hide);
             el.addEventListener('touchcancel', hide);
-            
             el.addEventListener('mousedown', show);
             el.addEventListener('mouseup', hide);
             el.addEventListener('mouseleave', hide);
