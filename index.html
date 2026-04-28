@@ -46,37 +46,41 @@
         .book-spine { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; }
         .spine-img { width: 160px; height: 220px; object-fit: cover; border-radius: 8px 15px 15px 8px; border: 2px solid white; box-shadow: -5px 15px 25px rgba(0,0,0,0.15); margin-bottom: 15px; }
 
-        /* 扉页 */
-        #view-cover { align-items: center; text-align: center; padding-top: 6vh; }
-        .book-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 42px; color: #0f172a; margin: 0 0 15px 0; }
-        
-        /* 🌟 目录页：两列紧凑模式优化 */
+        /* 扉页优化 */
+        #view-cover { align-items: center; text-align: center; padding-top: 4vh; }
+        #display-cover-img { width: 200px; height: 280px; object-fit: cover; border-radius: 10px; border: 4px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        .book-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 42px; color: #0f172a; margin: 0 0 10px 0; }
+        .book-desc { font-size: 18px; color: #64748b; margin-bottom: 30px; max-width: 90%; font-weight: 800; line-height: 1.6;}
+
+        /* 🌟 目录页：两列紧凑模式 + 居左对齐 */
         #display-toc {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* 强制两列并排 */
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
             padding: 10px 0;
         }
         .toc-item { 
             background: white; 
-            padding: 12px 10px; /* 缩小内边距 */
+            padding: 12px 15px; 
             border-radius: 12px; 
             border: 2px solid #e2e8f0; 
             cursor: pointer; 
             font-weight: 900; 
-            font-size: 15px; /* 稍微缩小字体 */
+            font-size: 15px; 
             transition: 0.2s; 
             box-shadow: 0 3px 0 #cbd5e1; 
-            text-align: center; 
+            text-align: left; /* 🎯 修复：居左对齐 */
             color: #1e293b;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; /* 文字过长显示省略号，保持整齐 */
+            text-overflow: ellipsis;
         }
         .toc-item:active { transform: translateY(3px); box-shadow: 0 0 0 transparent; background: #eff6ff; }
 
-        /* 阅读页 */
+        /* 🌟 阅读页：增加底部边距，防止文字被遮挡 */
         .reader-header { position: sticky; top: 0; background: rgba(255,252,240,0.96); padding: 15px 20px; border-bottom: 2px solid #e2e8f0; backdrop-filter: blur(8px); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        #view-reading { padding-bottom: 200px; } /* 🎯 修复：增加到底部 200px */
+        
         .chapter-img-inline { width: 100%; height: auto; display: block; border-radius: 15px; margin: 10px 0 25px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 4px solid white; background-color: #f1f5f9; }
         #story-content p { font-size: 22px; line-height: 2.2; color: #1e293b; font-weight: 700; margin-bottom: 1.2em; text-indent: 2em; letter-spacing: 0.5px; text-align: justify; }
 
@@ -109,6 +113,7 @@
         </div>
 
         <div id="view-cover" class="view">
+            <img id="display-cover-img" src="" alt="Cover">
             <h1 class="book-title" id="display-title">载入中...</h1>
             <p class="book-desc" id="display-desc"></p>
             <div class="char-grid" id="display-chars"></div>
@@ -159,7 +164,7 @@
                     switchView('view-bookshelf'); 
                 }
             });
-        } catch (e) { document.getElementById('loading-text').innerText = "加载失败，请检查网络。"; }
+        } catch (e) { document.getElementById('loading-text').innerText = "加载失败，请重试。"; }
     }
 
     function parseData(rows) {
@@ -174,8 +179,12 @@
     function renderBookInfo() {
         const bTitle = bookData.meta['Title'] || "我的书";
         const bPic = bookData.meta['Picture'] || "b1";
+        
+        // 渲染书架封面和扉页封面
         document.getElementById('shelf-title').innerText = bTitle;
         document.getElementById('shelf-cover-img').src = `./${bPic}.png`;
+        document.getElementById('display-cover-img').src = `./${bPic}.png`; // 🎯 修复：设置扉页图片
+        
         document.getElementById('display-title').innerText = bTitle;
         document.getElementById('display-desc').innerText = bookData.meta['Description'] || "";
 
@@ -197,16 +206,13 @@
         window.scrollTo(0, 0);
     }
 
-    // 🌟 修复版排版引擎：完美处理 视频、Media插画、以及自动命名的Png图
     function formatStoryContent(rawText, chapterIndex, mediaUrl) {
         let textBlocks = rawText.split(/\\n|\r?\n/);
         let paragraphs = [];
         let hasManualImg = false; 
         
-        // 1. 智能判定媒体代码
         let mediaHtml = "";
         if (mediaUrl && mediaUrl.trim() !== "") {
-            // A. 如果 Media 列有东西，就用那一列
             const url = mediaUrl.trim();
             if (url.match(/\.(mp4|webm|mov)$/i) || url.includes("video")) {
                 mediaHtml = `<video src="${url}" autoplay loop muted playsinline class="chapter-img-inline" style="cursor:pointer;" onclick="if(this.paused){this.play(); this.muted=false;}else{this.pause();}"></video>`;
@@ -214,13 +220,10 @@
                 mediaHtml = `<img src="${url}" class="chapter-img-inline" onerror="this.style.display='none'">`;
             }
         } else {
-            // B. 如果 Media 列是空的，回退到自动寻找Png插图的老规则
             const baseName = bookData.meta['Picture'] || "b1";
-            const fallbackImg = `./${baseName}c${chapterIndex + 1}.png`;
-            mediaHtml = `<img src="${fallbackImg}" class="chapter-img-inline" onerror="this.style.display='none'">`;
+            mediaHtml = `<img src="./${baseName}c${chapterIndex + 1}.png" class="chapter-img-inline" onerror="this.style.display='none'">`;
         }
 
-        // 2. 替换 [图] 占位符
         textBlocks.forEach(block => {
             let cleanBlock = block.trim();
             if (cleanBlock.length === 0) return;
@@ -257,18 +260,9 @@
             paragraphs.push(`<p>${tempDiv.innerHTML}</p>`);
         });
 
-        let finalHtml = "";
-        if (hasManualImg) {
-            finalHtml = paragraphs.join('');
-        } else {
-            // 如果全文没敲 [图]，默认插在第二段前面（作为展示图）
-            if (paragraphs.length > 1) {
-                finalHtml = paragraphs[0] + mediaHtml + paragraphs.slice(1).join('');
-            } else {
-                finalHtml = mediaHtml + (paragraphs[0] || "");
-            }
-        }
-        return finalHtml;
+        if (hasManualImg) return paragraphs.join('');
+        if (paragraphs.length > 1) return paragraphs[0] + mediaHtml + paragraphs.slice(1).join('');
+        return mediaHtml + (paragraphs[0] || "");
     }
 
     const pinyinWin = document.getElementById('pinyin-floating-window');
