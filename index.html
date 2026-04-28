@@ -46,41 +46,28 @@
         .book-spine { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; }
         .spine-img { width: 160px; height: 220px; object-fit: cover; border-radius: 8px 15px 15px 8px; border: 2px solid white; box-shadow: -5px 15px 25px rgba(0,0,0,0.15); margin-bottom: 15px; }
 
-        /* 扉页优化 */
+        /* 扉页 */
         #view-cover { align-items: center; text-align: center; padding-top: 4vh; }
         #display-cover-img { width: 200px; height: 280px; object-fit: cover; border-radius: 10px; border: 4px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 25px; }
         .book-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 42px; color: #0f172a; margin: 0 0 10px 0; }
         .book-desc { font-size: 18px; color: #64748b; margin-bottom: 30px; max-width: 90%; font-weight: 800; line-height: 1.6;}
+        
+        /* 人物卡片样式 */
+        .char-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px; margin-bottom: 40px; }
+        .char-card { background: white; padding: 15px 20px; border-radius: 20px; border: 3px solid #e2e8f0; text-align: left; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .char-avatar { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #bae6fd; flex-shrink: 0; background: #f1f5f9; }
+        .char-info { flex: 1; }
+        .char-name { font-weight: 900; font-size: 20px; color: var(--accent); margin-bottom: 4px; }
+        .char-intro { font-size: 15px; color: #475569; line-height: 1.5; font-weight: 700; }
 
-        /* 🌟 目录页：两列紧凑模式 + 居左对齐 */
-        #display-toc {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            padding: 10px 0;
-        }
-        .toc-item { 
-            background: white; 
-            padding: 12px 15px; 
-            border-radius: 12px; 
-            border: 2px solid #e2e8f0; 
-            cursor: pointer; 
-            font-weight: 900; 
-            font-size: 15px; 
-            transition: 0.2s; 
-            box-shadow: 0 3px 0 #cbd5e1; 
-            text-align: left; /* 🎯 修复：居左对齐 */
-            color: #1e293b;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        /* 目录页 */
+        #display-toc { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 0; }
+        .toc-item { background: white; padding: 12px 15px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; font-weight: 900; font-size: 15px; transition: 0.2s; box-shadow: 0 3px 0 #cbd5e1; text-align: left; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .toc-item:active { transform: translateY(3px); box-shadow: 0 0 0 transparent; background: #eff6ff; }
 
-        /* 🌟 阅读页：增加底部边距，防止文字被遮挡 */
+        /* 阅读页 */
         .reader-header { position: sticky; top: 0; background: rgba(255,252,240,0.96); padding: 15px 20px; border-bottom: 2px solid #e2e8f0; backdrop-filter: blur(8px); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        #view-reading { padding-bottom: 200px; } /* 🎯 修复：增加到底部 200px */
-        
+        #view-reading { padding-bottom: 220px; } /* 确保最后一行文字不被挡住 */
         .chapter-img-inline { width: 100%; height: auto; display: block; border-radius: 15px; margin: 10px 0 25px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 4px solid white; background-color: #f1f5f9; }
         #story-content p { font-size: 22px; line-height: 2.2; color: #1e293b; font-weight: 700; margin-bottom: 1.2em; text-indent: 2em; letter-spacing: 0.5px; text-align: justify; }
 
@@ -176,20 +163,29 @@
         });
     }
 
+    // 🎯 重新定义头像命名逻辑
+    function getAvatarName(name) {
+        if(name.includes("悦")) return "ly";
+        if(name.includes("静")) return "lj";
+        try { return pinyinPro.pinyin(name, { pattern: 'first', toneType: 'none', type: 'array' }).join(''); } 
+        catch(e) { return "avatar"; }
+    }
+
     function renderBookInfo() {
         const bTitle = bookData.meta['Title'] || "我的书";
         const bPic = bookData.meta['Picture'] || "b1";
         
-        // 渲染书架封面和扉页封面
         document.getElementById('shelf-title').innerText = bTitle;
         document.getElementById('shelf-cover-img').src = `./${bPic}.png`;
-        document.getElementById('display-cover-img').src = `./${bPic}.png`; // 🎯 修复：设置扉页图片
+        document.getElementById('display-cover-img').src = `./${bPic}.png`;
         
         document.getElementById('display-title').innerText = bTitle;
         document.getElementById('display-desc').innerText = bookData.meta['Description'] || "";
 
+        // 🎯 修复：重新接回头像图片 HTML
         document.getElementById('display-chars').innerHTML = bookData.characters.map(c => `
             <div class="char-card">
+                <img src="./${getAvatarName(c.name)}.png" class="char-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'none\\' viewBox=\\'0 0 24 24\\' stroke=\\'%2394a3b8\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\\'/></svg>'">
                 <div class="char-info">
                     <div class="char-name">${c.name}</div>
                     <div class="char-intro">${c.intro}</div>
