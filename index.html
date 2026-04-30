@@ -43,18 +43,24 @@
         /* 书架 */
         #view-bookshelf { align-items: center; padding-top: 8vh; background: #f8fafc; }
         .shelf-title-ui { font-weight: 900; color: #0f172a; font-size: 32px; margin-bottom: 40px; }
-        .book-spine { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; }
-        .spine-img { width: 160px; height: 220px; object-fit: cover; border-radius: 8px 15px 15px 8px; border: 2px solid white; box-shadow: -5px 15px 25px rgba(0,0,0,0.15); margin-bottom: 15px; }
+        
+        /* 🌟 动态书架网格样式 */
+        #bookshelf-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; width: 100%; }
+        .book-spine { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; width: 160px; }
+        .book-spine:active { transform: scale(0.95); }
+        .spine-img { width: 160px; height: 220px; object-fit: cover; border-radius: 8px 15px 15px 8px; border: 2px solid white; box-shadow: -5px 15px 25px rgba(0,0,0,0.15); margin-bottom: 15px; background: #cbd5e1; }
+        .spine-title { font-weight: 900; color: #1e293b; font-size: 16px; text-align: center; }
 
         /* 扉页 */
         #view-cover { align-items: center; text-align: center; padding-top: 4vh; }
-        #display-cover-img { width: 200px; height: 280px; object-fit: cover; border-radius: 10px; border: 4px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        #display-cover-img { width: 200px; height: 280px; object-fit: cover; border-radius: 10px; border: 4px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 25px; background: #cbd5e1; }
         .book-title { font-family: 'ZCOOL XiaoWei', serif; font-size: 42px; color: #0f172a; margin: 0 0 10px 0; }
         .book-desc { font-size: 18px; color: #64748b; margin-bottom: 30px; max-width: 90%; font-weight: 800; line-height: 1.6;}
         
         /* 人物卡片样式 */
         .char-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px; margin-bottom: 40px; }
-        .char-card { background: white; padding: 15px 20px; border-radius: 20px; border: 3px solid #e2e8f0; text-align: left; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .char-card { background: white; padding: 15px 20px; border-radius: 20px; border: 3px solid #e2e8f0; text-align: left; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; }
+        .char-card:active { transform: scale(0.98); }
         .char-avatar { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #bae6fd; flex-shrink: 0; background: #f1f5f9; }
         .char-info { flex: 1; }
         .char-name { font-weight: 900; font-size: 20px; color: var(--accent); margin-bottom: 4px; }
@@ -67,7 +73,7 @@
 
         /* 阅读页 */
         .reader-header { position: sticky; top: 0; background: rgba(255,252,240,0.96); padding: 15px 20px; border-bottom: 2px solid #e2e8f0; backdrop-filter: blur(8px); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        #view-reading { padding-bottom: 220px; } /* 确保最后一行文字不被挡住 */
+        #view-reading { padding-bottom: 120px; } 
         .chapter-img-inline { width: 100%; height: auto; display: block; border-radius: 15px; margin: 10px 0 25px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 4px solid white; background-color: #f1f5f9; }
         #story-content p { font-size: 22px; line-height: 2.2; color: #1e293b; font-weight: 700; margin-bottom: 1.2em; text-indent: 2em; letter-spacing: 0.5px; text-align: justify; }
 
@@ -79,28 +85,37 @@
         .btn-footer:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-prev { background: #f1f5f9; color: #64748b; border: 3px solid #e2e8f0; box-shadow: 0 5px 0 #cbd5e1; }
         .btn-next { background: var(--accent); color: white; box-shadow: 0 5px 0 #2563eb; }
+
+        /* 🌟 图片放大模态框 */
+        #img-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        #img-modal img { max-width: 90%; max-height: 90%; border-radius: 20px; border: 4px solid white; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
     <div id="pinyin-floating-window">py</div>
 
+    <!-- 图片放大容器 -->
+    <div id="img-modal" onclick="this.style.display='none'">
+        <img id="img-modal-target" src="">
+    </div>
+
     <div id="loading-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--paper-bg); z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
         <div style="font-size: 50px; animation: float 2s infinite alternate;">📖</div>
-        <div id="loading-text" style="font-weight:900; color:#3b82f6; margin-top:20px; font-size: 20px;">正在连接云端图书馆...</div>
+        <div id="loading-text" style="font-weight:900; color:#3b82f6; margin-top:20px; font-size: 20px;">正在整理书架...</div>
     </div>
 
     <div class="phone-container">
         <div id="view-bookshelf" class="view">
-            <div class="shelf-title-ui">📚 我的书架</div>
-            <div class="book-spine" onclick="switchView('view-cover')">
-                <img id="shelf-cover-img" src="" class="spine-img" onerror="this.src=''">
-                <div class="spine-title" id="shelf-title">载入中...</div>
-            </div>
+            <button onclick="window.location.href='../index.html'" style="align-self: flex-start; margin-bottom: 20px; padding: 10px 20px; border-radius: 15px; border: 3px solid #e2e8f0; background: white; font-weight: 900; color: #64748b; cursor: pointer; box-shadow: 0 4px 0 #cbd5e1;">← 返回主页</button>
+            <div class="shelf-title-ui">📚 家庭图书馆</div>
+            
+            <!-- 🌟 自动生成的书架网格 -->
+            <div id="bookshelf-grid"></div>
         </div>
 
         <div id="view-cover" class="view">
-            <img id="display-cover-img" src="" alt="Cover">
+            <img id="display-cover-img" src="" alt="Cover" onclick="showImageModal(this.src)">
             <h1 class="book-title" id="display-title">载入中...</h1>
             <p class="book-desc" id="display-desc"></p>
             <div class="char-grid" id="display-chars"></div>
@@ -119,7 +134,7 @@
         <div id="view-reading" class="view">
             <header class="reader-header">
                 <button onclick="switchView('view-toc')" class="btn-footer" style="flex:none; width:80px; padding:8px; font-size:13px; background:#f1f5f9; border: 2px solid #e2e8f0; box-shadow:0 3px 0 #cbd5e1;">⬅ 目录</button>
-                <span id="chapter-name-ui" style="font-weight:900; font-size: 17px;">章节</span>
+                <span id="chapter-name-ui" style="font-weight:900; font-size: 17px; text-align: center; flex: 1; margin: 0 10px;">章节</span>
                 <div style="width:80px;"></div>
             </header>
             <div style="margin-top:20px;">
@@ -133,13 +148,66 @@
     </div>
 
 <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-jsRDCZ56umRMvsaZiXPJbGYAxWEzq3kQ7Fv4JjPg3f1zhAU8uDL_HE6ZCFDOnTfJ7n81Ei0VLIWe/pub?gid=0&single=true&output=csv";
+    // 🌟 你的 Google 表格的基础链接（去掉了 gid 的部分）
+    const BASE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR-jsRDCZ56umRMvsaZiXPJbGYAxWEzq3kQ7Fv4JjPg3f1zhAU8uDL_HE6ZCFDOnTfJ7n81Ei0VLIWe/pub?single=true&output=csv&gid=";
+    
+    // 💡 必须配置：请将你的 Catalog 目录 Tab 的 GID 填在这里（假设它是 0）
+    const CATALOG_GID = "0"; 
+
     let bookData = { meta: {}, characters: [], chapters: [] };
     let currentChapterIdx = 0;
+    let currentBookCover = ""; // 用于缓存当前书的封面路径
 
-    async function loadBook() {
+    // 🌟 1. 页面加载时：首先读取 Catalog 目录
+    async function loadCatalog() {
         try {
-            const res = await fetch(CSV_URL + "&v=" + Date.now());
+            const res = await fetch(BASE_CSV_URL + CATALOG_GID + "&v=" + Date.now());
+            const csvText = await res.text();
+            Papa.parse(csvText, {
+                header: true,
+                transformHeader: h => h.replace(/^\uFEFF/, '').trim(),
+                complete: function(results) {
+                    renderBookshelf(results.data);
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    switchView('view-bookshelf'); 
+                }
+            });
+        } catch (e) { document.getElementById('loading-text').innerText = "书架加载失败，请重试。"; }
+    }
+
+    // 🌟 2. 渲染书架
+    function renderBookshelf(catalogRows) {
+        const grid = document.getElementById('bookshelf-grid');
+        grid.innerHTML = ''; // 清空
+
+        catalogRows.forEach(row => {
+            if (!row.GID || !row.Title) return; // 跳过空行
+            
+            // 如果没填封面，给个默认透明图防破图
+            const coverPath = row.Cover ? row.Cover.trim() : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; 
+            
+            const bookHtml = `
+                <div class="book-spine" onclick="openBook('${row.GID.trim()}', '${coverPath}')">
+                    <img src="${coverPath}" class="spine-img" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='">
+                    <div class="spine-title">${row.Title}</div>
+                </div>
+            `;
+            grid.innerHTML += bookHtml;
+        });
+
+        if (grid.innerHTML === '') {
+            grid.innerHTML = '<div style="color:#64748b; font-weight:800;">书架空空如也，快去 Catalog 里添加书籍吧！</div>';
+        }
+    }
+
+    // 🌟 3. 点击某本书时：拿着专属 GID 去抓取那本书的具体内容
+    async function openBook(targetGid, coverPath) {
+        document.getElementById('loading-overlay').style.display = 'flex';
+        document.getElementById('loading-text').innerText = "正在翻开书本...";
+        currentBookCover = coverPath; // 记住这本书的封面，用来渲染扉页
+
+        try {
+            const res = await fetch(BASE_CSV_URL + targetGid + "&v=" + Date.now());
             const csvText = await res.text();
             Papa.parse(csvText, {
                 header: true,
@@ -148,49 +216,61 @@
                     parseData(results.data);
                     renderBookInfo();
                     document.getElementById('loading-overlay').style.display = 'none';
-                    switchView('view-bookshelf'); 
+                    switchView('view-cover'); 
                 }
             });
-        } catch (e) { document.getElementById('loading-text').innerText = "加载失败，请重试。"; }
+        } catch (e) { 
+            alert("这本书还在编写中哦！");
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
     }
 
+    // 解析单本书的数据（和以前一样）
     function parseData(rows) {
+        bookData = { meta: {}, characters: [], chapters: [] }; // 清空上一本书的数据
         rows.forEach(row => {
             const type = (row.Type || row.TYPE || "").toUpperCase();
             if (type === 'META') bookData.meta[row.Title] = row.Content;
-            else if (type === 'CHAR') bookData.characters.push({ name: row.Title, intro: row.Content });
+            else if (type === 'CHAR') bookData.characters.push({ name: row.Title, intro: row.Content, avatar: row.Media }); // 增加了 Media 列作为头像路径
             else if (type === 'CHAPTER') bookData.chapters.push({ title: row.Title, content: row.Content, media: row.Media });
         });
     }
 
-    // 🎯 重新定义头像命名逻辑
-    function getAvatarName(name) {
-        if(name.includes("悦")) return "ly";
-        if(name.includes("静")) return "lj";
-        try { return pinyinPro.pinyin(name, { pattern: 'first', toneType: 'none', type: 'array' }).join(''); } 
-        catch(e) { return "avatar"; }
+    // 🎯 头像提取逻辑（如果有 Media 列直接用，没有则回退到公共池 chars 文件夹）
+    function getAvatarPath(c) {
+        if (c.avatar && c.avatar.trim() !== "") return c.avatar.trim();
+        
+        let name = c.name || "";
+        let shortName = "avatar";
+        if(name.includes("悦")) shortName = "ly";
+        else if(name.includes("静")) shortName = "lj";
+        else {
+            try { shortName = pinyinPro.pinyin(name, { pattern: 'first', toneType: 'none', type: 'array' }).join(''); } 
+            catch(e) { shortName = "avatar"; }
+        }
+        return `../chars/${shortName}.png`; // 默认去上一级的 chars 文件夹找公共头像
     }
 
+    // 显示扉页内容
     function renderBookInfo() {
-        const bTitle = bookData.meta['Title'] || "我的书";
-        const bPic = bookData.meta['Picture'] || "b1";
+        const bTitle = bookData.meta['Title'] || "未命名书籍";
         
-        document.getElementById('shelf-title').innerText = bTitle;
-        document.getElementById('shelf-cover-img').src = `./${bPic}.png`;
-        document.getElementById('display-cover-img').src = `./${bPic}.png`;
-        
+        document.getElementById('display-cover-img').src = currentBookCover;
         document.getElementById('display-title').innerText = bTitle;
         document.getElementById('display-desc').innerText = bookData.meta['Description'] || "";
 
-        // 🎯 修复：重新接回头像图片 HTML
-        document.getElementById('display-chars').innerHTML = bookData.characters.map(c => `
-            <div class="char-card">
-                <img src="./${getAvatarName(c.name)}.png" class="char-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'none\\' viewBox=\\'0 0 24 24\\' stroke=\\'%2394a3b8\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\\'/></svg>'">
+        // 渲染人物介绍（点击人物头像也可以放大查看高清大图）
+        document.getElementById('display-chars').innerHTML = bookData.characters.map(c => {
+            const avatarUrl = getAvatarPath(c);
+            return `
+            <div class="char-card" onclick="showImageModal('${avatarUrl}')">
+                <img src="${avatarUrl}" class="char-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'none\\' viewBox=\\'0 0 24 24\\' stroke=\\'%2394a3b8\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z\\'/></svg>'">
                 <div class="char-info">
                     <div class="char-name">${c.name}</div>
                     <div class="char-intro">${c.intro}</div>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
 
         document.getElementById('display-toc').innerHTML = bookData.chapters.map((ch, i) => `
             <div class="toc-item" onclick="openChapter(${i})">${ch.title}</div>`).join('');
@@ -202,22 +282,35 @@
         window.scrollTo(0, 0);
     }
 
+    // 🌟 图片放大查看功能
+    function showImageModal(src) {
+        document.getElementById('img-modal-target').src = src;
+        document.getElementById('img-modal').style.display = 'flex';
+    }
+
+    // 渲染正文（支持根据目录推算默认图片路径）
     function formatStoryContent(rawText, chapterIndex, mediaUrl) {
         let textBlocks = rawText.split(/\\n|\r?\n/);
         let paragraphs = [];
         let hasManualImg = false; 
         
         let mediaHtml = "";
+        
+        // 尝试推算这本书文件夹的基础路径 (比如去掉 cover.png)
+        let bookFolderPath = currentBookCover.substring(0, currentBookCover.lastIndexOf('/') + 1);
+
         if (mediaUrl && mediaUrl.trim() !== "") {
             const url = mediaUrl.trim();
             if (url.match(/\.(mp4|webm|mov)$/i) || url.includes("video")) {
                 mediaHtml = `<video src="${url}" autoplay loop muted playsinline class="chapter-img-inline" style="cursor:pointer;" onclick="if(this.paused){this.play(); this.muted=false;}else{this.pause();}"></video>`;
             } else {
-                mediaHtml = `<img src="${url}" class="chapter-img-inline" onerror="this.style.display='none'">`;
+                mediaHtml = `<img src="${url}" class="chapter-img-inline" onclick="showImageModal(this.src)" onerror="this.style.display='none'">`;
             }
         } else {
-            const baseName = bookData.meta['Picture'] || "b1";
-            mediaHtml = `<img src="./${baseName}c${chapterIndex + 1}.png" class="chapter-img-inline" onerror="this.style.display='none'">`;
+            // 如果没填图片路径，根据我们之前定好的命名规范，默认去书夹里找 b1c1.png 这种
+            // 因为现在我们不知道具体是 b1 还是 b2，所以如果表里没填，尽量要求填表，或者提供一个智能降级
+            const basePrefix = bookData.meta['BookID'] || "b1"; // 最好在 META 里配一个 BookID 叫 b1
+            mediaHtml = `<img src="${bookFolderPath}${basePrefix}c${chapterIndex + 1}.png" class="chapter-img-inline" onclick="showImageModal(this.src)" onerror="this.style.display='none'">`;
         }
 
         textBlocks.forEach(block => {
@@ -293,7 +386,9 @@
         let newIdx = currentChapterIdx + step;
         if (newIdx >= 0 && newIdx < bookData.chapters.length) openChapter(newIdx);
     }
-    document.addEventListener('DOMContentLoaded', loadBook);
+    
+    // 启动引擎
+    document.addEventListener('DOMContentLoaded', loadCatalog);
 </script>
 </body>
 </html>
